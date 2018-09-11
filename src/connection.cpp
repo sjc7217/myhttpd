@@ -16,7 +16,7 @@ Connection::~Connection() {}
 bool Connection::InitConnection(Worker *worker) {
 	this->con_worker = worker;
 
-	try {                                                                                //先给缓冲区分配足够空间
+	try {                 //先给缓冲区分配足够空间
 		con_inbuf.reserve(10 * 1024);
 		con_outbuf.reserve(10 * 1024);
 	} catch (std::bad_alloc) {
@@ -58,7 +58,7 @@ void Connection::ConReadCallback(uv_stream_t *stream, ssize_t nread, const uv_bu
 
 	Connection *con = (Connection *) (((uv_tcp_t *) stream)->data);
 
-	if (nread >= 0) {
+	if (nread > 0) {
 		con->con_inbuf += std::string(buf->base, nread);//否则不断调用回调函数进行读取
 		con->con_state = CON_STATE_READ_END;
 		free(buf->base);
@@ -76,15 +76,13 @@ void Connection::ConWriteCallback(uv_write_t *req, int status) {
 
 	write_req_t *wri = (write_req_t *) req;
 
-	Connection *con = (Connection *) (wri->req.data);
+	//Connection *con = (Connection *) (wri->req.data);
 
 	uv_buf_t *buff = &wri->buf;
 	free(buff->base);
 	free(wri);
-
-	con->con_state = CON_STATE_ERROR;//CON_STATE_RESPONSE_END;
-
-	con->StateMachine();
+	//con->con_state = CON_STATE_ERROR;//CON_STATE_RESPONSE_END;
+	//con->StateMachine();
 }
 
 void Connection::ConShutdownCallback(uv_shutdown_t *req, int status) {
@@ -99,7 +97,7 @@ void Connection::ConCloseCallback(uv_handle_t *handle) {
 }
 
 bool Connection::StateMachine() {                                    //return false的时候回调直接关闭该连接；return true的时候正常结束本次回调
-	request_state_t req_state;
+	request_state_t req_state; //请求是否完整的标志
 
 	while (true) {
 		switch (con_state) {
@@ -115,7 +113,7 @@ bool Connection::StateMachine() {                                    //return fa
 				break;                            //这次回调继续在状态机中进行，运行到下一个状态，其实这里直接返回true不就好了？
 
 			case CON_STATE_READ:        //从上一状态进入，负责读事件的监听绑定。
-				uv_read_start((uv_stream_t *) this->tcp_conn, Worker::alloc_buffer, Connection::ConReadCallback);
+				uv_read_start((uv_stream_t *) (this->tcp_conn), Worker::alloc_buffer, Connection::ConReadCallback);
 				return true;
 
 			case CON_STATE_READ_END: { //本次读端口完成，测试缓冲区中的请求是否完整，若不完整继续回到CON_STATE_READ，否则进入CON_STATE_RESPONSE_START状态。
@@ -146,12 +144,13 @@ bool Connection::StateMachine() {                                    //return fa
 				req->req.data = this->tcp_conn;
 				//用缓存中的起始地址和大小初始化写数据对象write_req_t
 				char *buff_ = (char *) malloc(con_outbuf.size());
-				snprintf(buff_, con_outbuf.size(),con_outbuf.c_str());
+				snprintf(buff_, con_outbuf.size(),con_outbuf.data());
 				req->buf = uv_buf_init(buff_, con_outbuf.size());
 				//写数据，并将写数据对象write_req_t和客户端、缓存、回调函数关联，第四个参数表示创建一个uv_buf_t缓存，不是1个字节
 				uv_write((uv_write_t *) req, (uv_stream_t *) this->tcp_conn, &req->buf, 1, Connection::ConWriteCallback);
-
-				return true;
+				SetState(CON_STATE_READ_END);
+				break;                    //已经读到数据，直接转换状态进行下一状态的变化
+				//return true;
 			}
 
 			case CON_STATE_RESPONSE_END: {  //写入完毕，检查缓冲区是否有完整请求，有则继续处理，否则进入读状态。

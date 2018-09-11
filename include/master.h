@@ -18,9 +18,7 @@ public:
 
 private:
 
-    Worker m_worker;                //每个Master类里面有一个Worker类，fork之后Worker类负责本进程正常工作？
-
-    int nums_of_child;
+    Worker m_worker;    //每个Master类里面有一个Worker类，fork之后Worker类负责本进程正常工作
 };
 
 #endif

@@ -3,7 +3,7 @@ project(myhttpd)
 
 INCLUDE_DIRECTORIES( include )
 #message(${SLIGHTTPD_BINARY_DIR})
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++11 -g)
 
 include_directories( /usr/local/include)
 LINK_DIRECTORIES(/usr/local/lib)

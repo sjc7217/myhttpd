@@ -7,10 +7,10 @@ Listener::Listener() {
 }
 
 Listener::~Listener() {}
-Worker *Listener::listen_worker = nullptr;
+//Worker *Listener::listen_worker = nullptr;
 
 bool Listener::InitListener(Worker *worker) {
-	Listener::listen_worker = worker;
+	this->listen_worker = worker;
 	//改用libuv的接口设置监听地址
 	const char *ad = worker->w_master->conf_para.ListenIP.c_str();
 	int port_ = worker->w_master->conf_para.ListenPort;
@@ -24,11 +24,10 @@ bool Listener::InitListener(Worker *worker) {
 	return true;
 }
 
-void Listener::ListenEventCallback(uv_stream_t *server,
-								   int status) {//evutil_socket_t sockfd, short event, void *arg)            //监听事件回调函数
+void Listener::ListenEventCallback(uv_stream_t *server, int status) {//evutil_socket_t sockfd, short event, void *arg)            //监听事件回调函数
 	if (status < 0) {
 		//新建连接出错
-		fprintf(stderr, "New connection error %s\n", uv_strerror(status));
+		std::cerr << "New connection error" << uv_strerror(status);
 		return;
 	}
 	//为新的连接分配内存
@@ -43,21 +42,21 @@ void Listener::ListenEventCallback(uv_stream_t *server,
 //		uv_close((uv_handle_t*)client,NULL);
 //		std::cout<<"close successful!"<<std::endl;
 //		return;
-
-		Connection *con = Listener::listen_worker->NewCon();
+		Worker * w = (Worker*)(server->data);
+		Connection *con = w->NewCon();
 		if (con == nullptr) {
 			std::cerr << "Listener::ListenEventCallback(): NewCon()" << std::endl;
 			return;
 		}
 		client->data = con;                //将Connection指针放到uv_tcp_t的数据中，使得回调函数可以得到连接对象
 		con->tcp_conn = client;            //每个Connection对象维护一个uv_tcp_t对象。
-		if (!con->InitConnection(Listener::listen_worker)) {    //返回false表示连接建立失败
+		if (!con->InitConnection(w)) {    //返回false表示连接建立失败
 			std::cerr << "Listener::ListenEventCallback(): Connection::InitConnection()" << std::endl;
 			Worker::CloseCon(con);
 			return;
 		}
 		//con->con_worker->w_con_map[client] = con;
-		++(Worker::w_listener->listen_con_cnt);
+		++(w->w_listener->listen_con_cnt);
 	} else {
 		//读取失败，释放处理对象
 		uv_close((uv_handle_t *) client, NULL);

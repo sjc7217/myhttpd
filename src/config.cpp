@@ -292,13 +292,15 @@ void Config::Para_FileParse(std::string file) {                //根据配置文
 
 
 int Config::InitPara(int argc, char *argv[]) {
-	/*解析命令行输入参数*/
-	if (0 != Para_CmdParse(argc, argv))
-		return -1;
+	
 	/*解析配置文件配置参数*/
 	if (ConfigFile.size())
 		Para_FileParse(ConfigFile);
 
+	/*解析命令行输入参数*/
+	if (0 != Para_CmdParse(argc, argv))
+		return -1;
+		
 	display_para();
 
 	/*返回配置参数*/

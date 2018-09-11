@@ -45,11 +45,11 @@ public:
 	~Connection();
 	bool InitConnection(Worker *worker);
 	void ResetCon();
+	bool StateMachine();
 
 public:
 
 	uv_tcp_t *tcp_conn;
-
 	typedef std::queue<HttpRequest *> req_queue_t; //connection内部对于request的缓冲，采用了堆空间，记得析构
 
 	Worker *con_worker;
@@ -57,9 +57,7 @@ public:
 	HttpRequest *http_req_parser;   //解析时用
 	HttpRequest *http_req_parsed;   //处理请求时用
 	HttpResponse http_response;
-	connection_on_use con_use;
-	bool StateMachine();
-
+	connection_on_use con_use;	//用于表示当前连接状态(正在使用,空闲,或者是新建连接,不在连接池)
 	//static void ConEventCallback(uv_os_fd_t fd, short event, void *arg);
 
 	static void ConReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
@@ -81,7 +79,6 @@ private:
 	int con_req_cnt;
 	HttpParser http_parser;
 	std::string con_inbuf;             //三个缓冲区
-	//std::string con_intmp;
 	std::string con_outbuf;
 	connection_state_t con_state;
 	request_state_t req_state;

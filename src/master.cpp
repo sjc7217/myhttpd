@@ -1,26 +1,24 @@
-#include "header.h"
 #include "master.h"
-Master::Master() {
-	nums_of_child = 0;
-}
+
+Master::Master() {}
 
 Master::~Master() {}
 
 int Master::StartMaster(int argc, char *argv[]) {
-	if (0 != conf_para.InitPara(argc, argv))                    //master做的第一步就是获取程序运行所需配置值，将其存储在Master类的conf_para变量中
+	if (0 != conf_para.InitPara(argc, argv)) {                 //master做的第一步就是获取程序运行所需配置值，将其存储在Master类的conf_para变量中
 		return -2;
+		std::cerr<<"Syntex error in config file!";
+	}
 
-	std::cout << "Start Master" << std::endl;
+	std::cerr << "Start Master" << std::endl;
 
 	if (conf_para.Daemonize) daemon(1, 0);
 
 	if (!m_worker.Init(this)) {       //在fork之前完成了各个子进程的listener的初始化工作，后续只需要对同一个socket进行监听
-		std::cerr << "Master: Worker::Init()" << std::endl;
+		std::cerr << "Master: Worker::Init failed,quit!" << std::endl;
 		return false;
 	}
-
-	nums_of_child = conf_para.MaxWorker;
-	//创建一定数量的worker
+	//创建一定数量的worker,对于libuv不适用
 	m_worker.Run();
 //	while (1) {
 //

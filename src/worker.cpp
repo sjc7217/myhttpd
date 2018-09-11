@@ -1,18 +1,15 @@
-#include "header.h"
 #include "worker.h"
-#include "listener.h"
 #include "master.h"
-#include "connection.h"
+
 Worker::Worker() {
 	w_master = nullptr;
-    loop = uv_default_loop();
     w_listener = new Listener();
+    tcp_server_listen.data = this;
 }
 
 Worker::~Worker() {}
 
 uv_loop_t *Worker::loop = uv_default_loop();
-Listener *Worker::w_listener = nullptr;
 
 void Worker::close_cb(uv_handle_t *handle) {
 	std::cout << "close successfully!" << std::endl;
@@ -30,11 +27,10 @@ void Worker::alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *
 
 bool Worker::Init(Master *master) {
 	w_master = master;
-
     InitConPool();
     //初始化连接池
     uv_tcp_init(Worker::loop, &this->tcp_server_listen);
-    if (!Worker::w_listener->InitListener(this)) {
+    if (!this->w_listener->InitListener(this)) {
 		std::cerr << "Worker: Listener::InitListener()" << std::endl;
 		return false;
 	}
@@ -49,9 +45,7 @@ void Worker::Run() {
 void Worker::InitConPool() {
 	con_pool_size = w_master->conf_para.InitConPool;
 	con_pool_cur = 0;
-	con_pool.resize(con_pool_size);
-
-    for (int i = 0; i < con_pool_size; ++i) con_pool[i] = new Connection();    //初始化连接池
+    for (int i = 0; i < con_pool_size; ++i) con_pool.push_back(new Connection());    //初始化连接池
 }
 
 Connection *Worker::GetFreeCon() {
@@ -76,7 +70,7 @@ void Worker::CloseCon(Connection *con) {    //关闭连接，从连接池中释�
 
     if (con->con_use == CONNECTION_BUSY) {//如果连接在连接池则只是重置之后放回池中
         con->con_use = CONNECTION_IDLE;
-        worker->con_pool_cur--;
+        --worker->con_pool_cur;
     } else if (con->con_use == CONNECTION_ADD) {//如果连接是多余的，直接删除，析构掉
         delete (con);
 	}

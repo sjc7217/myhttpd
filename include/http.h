@@ -41,7 +41,7 @@ public:
 private:                                                                        //当前类的私有静态函数
 
 	static int OnMessageBeginCallback(
-			http_parser *parser);                     //httpparser在解析过程中并不保留状态，相关数据或者要求可以在相应settings中通过设置回调函数实现
+			http_parser *parser);  //http_parser在解析过程中并不保留状态，相关数据或者要求可以在相应settings中通过设置回调函数实现
 	static int OnUrlCallback(http_parser *parser, const char *at, size_t length);
 
 	static int OnHeaderFieldCallback(http_parser *parser, const char *at, size_t length);

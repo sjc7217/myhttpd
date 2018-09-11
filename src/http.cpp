@@ -1,4 +1,3 @@
-#include "header.h"
 #include "http.h"
 #include "connection.h"
 std::string HttpResponse::GetResponse()                                     //从HttpResponse中返回所需要的内容字节流
@@ -16,8 +15,8 @@ std::string HttpResponse::GetResponse()                                     //�
 
 
 	std::string b = "<html>\n"
-					"<title>slighttpd</title>\n"
-					"<p>Welcome to slighttpd.\n"
+					"<title>myhttpd</title>\n"
+					"<p>Welcome to myhttpd.\n"
 					"<h1>CGI demo</h1>\n"
 					"<p>\n"
 					"<a href=\"../cgi/date.cgi\">Display Date</a>\n"
@@ -136,8 +135,7 @@ int HttpParser::OnMessageCompleteCallback(http_parser *parser)  //结束解析�
 	Connection *con = static_cast<Connection *>(parser->data);
 	HttpRequest *request = con->http_req_parser;
 
-	con->req_queue.push(
-			request);       //解析完成队列+1并清空http_req_parser，注意这里并不free数据，因为队列里面存储的是指针
+	con->req_queue.push(request);       //解析完成队列+1并清空http_req_parser，注意这里并不free数据，因为队列里面存储的是指针
 	con->http_req_parser = nullptr;
 
 
