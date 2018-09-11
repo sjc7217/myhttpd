@@ -1,6 +1,6 @@
 #include "http.h"
 #include "connection.h"
-std::string HttpResponse::GetResponse()                                     //从HttpResponse中返回所需要的内容字节流
+std::string HttpResponseContent::GetResponse()                                     //从HttpResponse中返回所需要的内容字节流
 {
 	std::ostringstream ostream;
 	ostream << "HTTP/1.1" << " " << http_code << " " << http_phrase << "\r\n"
@@ -30,7 +30,7 @@ std::string HttpResponse::GetResponse()                                     //�
 	return ostream.str();
 }
 
-void HttpResponse::ResetResponse()                                          //重置Response
+void HttpResponseContent::ResetResponse()                                          //重置Response
 {
 	//http_version = "HTTP/1.1";
 	http_code = 200;
@@ -55,7 +55,7 @@ void HttpParser::InitParser(Connection *con) {
 	parser.data = con;           //parser对象里面指向连接conn的钩子指针
 }
 
-int HttpParser::HttpParseRequest(const std::string &inbuf) {//在parse的灰调函数中对connection中的request进行处理
+int HttpParser::HttpParseRequest(const std::string &inbuf) {//在parse的回调函数中对connection中的request进行处理
 	int nparsed = http_parser_execute(&parser, &settings, inbuf.c_str(), inbuf.size());//该函数不会对原缓冲区产生任何影响
 
 	if (parser.http_errno != HPE_OK)      //http_parse执行出错http_errno就会设置成错误类型
@@ -70,7 +70,7 @@ int HttpParser::OnMessageBeginCallback(http_parser *parser)     //request解析�
 {
 	Connection *con = static_cast<Connection *>(parser->data);
 
-	con->http_req_parser = new HttpRequest();           //注意析构
+	con->http_req_parser = new struct HttpRequestContent();           //注意析构
 
 	return 0;
 }
@@ -98,7 +98,7 @@ int HttpParser::OnHeaderValueCallback(http_parser *parser, const char *at,
 									  size_t length)       //把http头的键值对放到map<std::string,std::string>里面去
 {
 	Connection *con = static_cast<Connection *>(parser->data);
-	HttpRequest *request = con->http_req_parser;
+	HttpRequestContent *request = con->http_req_parser;
 
 	request->http_headers[request->http_header_field] = std::string(at, length);
 
@@ -110,7 +110,7 @@ int HttpParser::OnHeaderValueCallback(http_parser *parser, const char *at,
 int HttpParser::OnHeadersCompleteCallback(http_parser *parser) //获取request类型
 {
 	Connection *con = static_cast<Connection *>(parser->data);
-	HttpRequest *request = con->http_req_parser;
+	HttpRequestContent *request = con->http_req_parser;
 	request->http_method = http_method_str((http_method) parser->method);
 
 	//std::cout<<"http_method:"<<request->http_method<<std::endl;
@@ -133,12 +133,10 @@ int HttpParser::OnBodyCallback(http_parser *parser, const char *at, size_t lengt
 int HttpParser::OnMessageCompleteCallback(http_parser *parser)  //结束解析的时候调用
 {
 	Connection *con = static_cast<Connection *>(parser->data);
-	HttpRequest *request = con->http_req_parser;
+	HttpRequestContent *request = con->http_req_parser;
 
 	con->req_queue.push(request);       //解析完成队列+1并清空http_req_parser，注意这里并不free数据，因为队列里面存储的是指针
 	con->http_req_parser = nullptr;
-
-
 	//std::cout<<"http_parser end!"<<std::endl;
 	//std::cout << __FUNCTION__ << std::endl;
 

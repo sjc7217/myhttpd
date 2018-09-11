@@ -8,7 +8,7 @@ class Connection;
 typedef std::map<std::string, std::string> header_t;
 typedef header_t::iterator header_iter_t;
 
-struct HttpRequest {
+struct HttpRequestContent {
 	std::string http_method;
 	std::string http_url;
 
@@ -18,7 +18,7 @@ struct HttpRequest {
 	std::string http_body;
 };
 
-struct HttpResponse {
+struct HttpResponseContent {
 	int http_code;
 	std::string http_phrase;
 

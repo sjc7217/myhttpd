@@ -50,13 +50,13 @@ public:
 public:
 
 	uv_tcp_t *tcp_conn;
-	typedef std::queue<HttpRequest *> req_queue_t; //connection内部对于request的缓冲，采用了堆空间，记得析构
+	typedef std::queue<struct HttpRequestContent *> req_queue_t; //connection内部对于request的缓冲，采用了堆空间，记得析构
 
 	Worker *con_worker;
 	req_queue_t req_queue;
-	HttpRequest *http_req_parser;   //解析时用
-	HttpRequest *http_req_parsed;   //处理请求时用
-	HttpResponse http_response;
+	struct HttpRequestContent *http_req_parser;   //解析时用
+	struct HttpRequestContent *http_req_parsed;   //处理请求时用
+	struct HttpResponseContent http_response;
 	connection_on_use con_use;	//用于表示当前连接状态(正在使用,空闲,或者是新建连接,不在连接池)
 	//static void ConEventCallback(uv_os_fd_t fd, short event, void *arg);
 

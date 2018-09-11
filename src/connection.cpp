@@ -63,7 +63,7 @@ void Connection::ConReadCallback(uv_stream_t *stream, ssize_t nread, const uv_bu
 		con->con_state = CON_STATE_READ_END;
 		free(buf->base);
 		con->StateMachine();
-	}else{
+	}else{ //nread < 0 表示出错, nread == 0 表示连接已经断开,此时直接设置CON_STATE_ERROR
 		con->con_state = CON_STATE_ERROR;
 		con->StateMachine();
 		//uv_close((uv_handle_t*) stream, NULL);
@@ -159,7 +159,7 @@ bool Connection::StateMachine() {                                    //return fa
 				break;
 			}
 
-			case CON_STATE_ERROR: {   //Connection出错进入该状态，清除所有连接资源，释放该连接。
+			case CON_STATE_ERROR: {   //Connection出错或者连接关闭进入该状态，清除所有连接资源，释放该连接。
 				//Worker::CloseCon(this);
 //				uv_shutdown_t * shutd = (uv_shutdown_t *)malloc(sizeof(uv_shutdown_t));
 //				shutd->data = this->tcp_conn;
