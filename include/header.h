@@ -1,8 +1,8 @@
 //
 // Created by LordShi on 2018/6/6.
 //
-#ifndef SLIGHTTPD_HEADER_H
-#define SLIGHTTPD_HEADER_H
+#ifndef MYHTTPD_HEADER_H
+#define MYTTPD_HEADER_H
 
 #include <getopt.h>
 #include <cstdlib>
@@ -19,7 +19,7 @@
 #include <sys/socket.h>
 #include <assert.h>
 
-#include "uv.h"
+#include <uv.h>
 
 #include <map>
 #include <iostream>
@@ -34,15 +34,7 @@
 
 #include <unordered_set>
 
-#include "plugin.h"
-#include "config.h"
-#include "http.h"
-#include "connection.h"
-#include "listener.h"
-#include "worker.h"
-#include "master.h"
-
-#endif //SLIGHTTPD_HEADER_H
+#endif //
 
 
 

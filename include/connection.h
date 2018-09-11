@@ -1,7 +1,10 @@
-#include "header.h"
-
 #ifndef _CONNECTION_H
 #define _CONNECTION_H
+
+#include "header.h"
+#include "http.h"
+#include "worker.h"
+
 
 typedef enum {
 	CONNECTION_BUSY,

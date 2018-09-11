@@ -1,8 +1,9 @@
-#include "header.h"
-
 #ifndef _MASTER_H
 #define _MASTER_H
 
+#include "header.h"
+#include "config.h"
+#include "worker.h"
 
 class Master {
 public:

@@ -1,5 +1,7 @@
 #include "header.h"
-
+#include "listener.h"
+#include "worker.h"
+#include "master.h"
 Listener::Listener() {
 	listen_con_cnt = 0;
 }

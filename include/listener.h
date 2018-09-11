@@ -1,8 +1,8 @@
-#include "header.h"
-
 #ifndef _LISTENER_H
 #define _LISTENER_H
 
+#include "header.h"
+#include "connection.h"
 
 class Worker;
 

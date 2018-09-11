@@ -1,6 +1,8 @@
 #include "header.h"
-
-
+#include "worker.h"
+#include "listener.h"
+#include "master.h"
+#include "connection.h"
 Worker::Worker() {
 	w_master = nullptr;
     loop = uv_default_loop();

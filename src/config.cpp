@@ -1,5 +1,5 @@
 #include "header.h"
-
+#include "config.h"
 static char *l_opt_arg;
 static std::string shortopts = "a:c:d:f:hi:o:l:m:t:s";
 
@@ -38,7 +38,7 @@ Config::~Config() {
 }
 
 void Config::display_usage() {
-	std::cout << "./slighttpd [option]..." << std::endl;
+	std::cout << "./myhttpd [option]..." << std::endl;
     std::cout << "  -l|--ListenPort<number>     Default: 8000" << std::endl;
     std::cout << "  -m|--MaxWorker<number>      Default: 4" << std::endl;
     std::cout << "  -i|--InitConPool<number>    Default: 200" << std::endl;
@@ -47,12 +47,12 @@ void Config::display_usage() {
     std::cout << "  -c|--CGIRoot<path>          Default: ./cgi/" << std::endl;
     std::cout << "  -d|--DefaultFile<filename>  Default: index.html" << std::endl;
     std::cout << "  -t|--TimeOut<seconds>       Default: 3" << std::endl;
-    std::cout << "  -f|--ConfigFile<filename>   Default: ./slighttpd.conf" << std::endl;
+    std::cout << "  -f|--ConfigFile<filename>   Default: ./myhttpd.conf" << std::endl;
     std::cout << "  -s|--Daemonize              Default: Daemonize Disabled" << std::endl;
 }
 
 void Config::display_para() {
-	std::cout << "slighttpd - Simple Http Server Demo" << std::endl;
+	std::cout << "myhttpd - Simple Http Server" << std::endl;
 	std::cout << std::endl;
 	std::cout << "-ListenIP:	" << ListenIP << std::endl;
 	std::cout << "-ListenPort:	" << ListenPort << std::endl;

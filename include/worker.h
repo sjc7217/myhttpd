@@ -1,12 +1,12 @@
-
-#include "header.h"
-
 #ifndef _WORKER_H
 #define _WORKER_H
+
+#include "header.h"
 
 class Master;
 class Connection;
 class Plugin;
+class Listener;
 
 class Worker {
 public:

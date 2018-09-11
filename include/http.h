@@ -1,7 +1,7 @@
-#include "header.h"
-
 #ifndef _HTTP_H
 #define _HTTP_H
+
+#include "header.h"
 
 class Connection;
 

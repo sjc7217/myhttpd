@@ -1,5 +1,5 @@
 #include "header.h"
-
+#include "plugin.h"
 Plugin::Plugin() {
 	plugin_data = nullptr;
 	plugin_is_loaded = false;

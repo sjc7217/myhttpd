@@ -1,5 +1,6 @@
 #include "header.h"
-
+#include "http.h"
+#include "connection.h"
 Connection::Connection() {
 	con_worker = nullptr;
 	http_req_parsed = nullptr;

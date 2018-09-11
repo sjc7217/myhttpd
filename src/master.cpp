@@ -1,5 +1,5 @@
 #include "header.h"
-
+#include "master.h"
 Master::Master() {
 	nums_of_child = 0;
 }

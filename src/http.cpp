@@ -1,5 +1,6 @@
 #include "header.h"
-
+#include "http.h"
+#include "connection.h"
 std::string HttpResponse::GetResponse()                                     //从HttpResponse中返回所需要的内容字节流
 {
 	std::ostringstream ostream;
@@ -81,7 +82,7 @@ int HttpParser::OnUrlCallback(http_parser *parser, const char *at, size_t length
 
 	con->http_req_parser->http_url.assign(at, length);
 
-	std::cout<<"URL:"<<at<<std::endl;
+	//std::cout<<"URL:"<<at<<std::endl;
 
 	return 0;
 }
@@ -102,7 +103,7 @@ int HttpParser::OnHeaderValueCallback(http_parser *parser, const char *at,
 
 	request->http_headers[request->http_header_field] = std::string(at, length);
 
-	std::cout<<request->http_header_field<<":"<<at<<std::endl;
+	//std::cout<<request->http_header_field<<":"<<at<<std::endl;
 
 	return 0;
 }
@@ -113,7 +114,7 @@ int HttpParser::OnHeadersCompleteCallback(http_parser *parser) //获取request�
 	HttpRequest *request = con->http_req_parser;
 	request->http_method = http_method_str((http_method) parser->method);
 
-	std::cout<<"http_method:"<<request->http_method<<std::endl;
+	//std::cout<<"http_method:"<<request->http_method<<std::endl;
 
 	return 0;
 }
@@ -125,7 +126,7 @@ int HttpParser::OnBodyCallback(http_parser *parser, const char *at, size_t lengt
 	// NOTICE:OnBody may be called many times per Reuqest
 	con->http_req_parser->http_body.append(at, length);
 
-	std::cout<<"body:"<<at<<std::endl;
+	//std::cout<<"body:"<<at<<std::endl;
 
 	return 0;
 }
@@ -140,7 +141,7 @@ int HttpParser::OnMessageCompleteCallback(http_parser *parser)  //结束解析�
 	con->http_req_parser = nullptr;
 
 
-	std::cout<<"http_parser end!"<<std::endl;
+	//std::cout<<"http_parser end!"<<std::endl;
 	//std::cout << __FUNCTION__ << std::endl;
 
 	return 0;

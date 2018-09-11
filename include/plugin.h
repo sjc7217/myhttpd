@@ -1,9 +1,8 @@
-
-#include "header.h"
-
 #ifndef _PLUGIN_H
 #define _PLUGIN_H
 
+
+#include "header.h"
 
 class Worker;
 
