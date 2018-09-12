@@ -35,7 +35,7 @@ bool Connection::InitConnection(Worker *worker) {
 }
 
 void Connection::ResetCon() {   //重置连接，把connection里面所有动态内存全部释放
-	HttpRequest *request;
+	HttpRequestContent *request;
 
 	while (!req_queue.empty()) {    //request队列里面的动态request全部析构掉
 		request = req_queue.front();
@@ -96,8 +96,8 @@ void Connection::ConCloseCallback(uv_handle_t *handle) {
 	free(handle);
 }
 
-bool Connection::StateMachine() {                                    //return false的时候回调直接关闭该连接；return true的时候正常结束本次回调
-	request_state_t req_state; //请求是否完整的标志
+bool Connection::StateMachine() { //return false的时候回调直接关闭该连接；return true的时候正常结束本次回调
+	request_state_t req_state;    //请求是否完整的标志
 
 	while (true) {
 		switch (con_state) {
@@ -130,11 +130,11 @@ bool Connection::StateMachine() {                                    //return fa
 					//break;
 					return true;
 				}                              //整个连接的绝大部分等待时间都停留在等待request数据读取阶段，并可能在这里暂停逻辑，等待事件回调
-
 			}
 				//完成上一步仅仅把request放入了req_queue队列里面，后面需要做的就是通过第三方web程序反馈响应！！！
 			case CON_STATE_RESPONSE_START: {//开始response之前的准备工作！
-				con_outbuf += http_response.GetResponse();  //把这次request的response写入缓冲区，之后就可以清除这次request的相关数据然后等待下一次request了
+				con_outbuf += http_response.GetResponse(http_req_parsed->GetRequestContent());  //把这次request的response写入缓冲区，之后就可以清除这次request的相关数据然后等待下一次request了
+				//std::cerr<<reinterpret_cast<long>(this)<<std::endl;  //输出connect地址用于debug
 				SetState(CON_STATE_WRITE);
 				break;
 			}

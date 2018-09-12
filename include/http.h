@@ -16,6 +16,7 @@ struct HttpRequestContent {
 	std::string http_header_field; //field is waiting for value while parsing
 
 	std::string http_body;
+	std::string GetRequestContent();
 };
 
 struct HttpResponseContent {
@@ -26,7 +27,7 @@ struct HttpResponseContent {
 
 	std::string http_body;
 
-	std::string GetResponse();
+	std::string GetResponse(std::string content);
 
 	void ResetResponse();
 };

@@ -1,6 +1,6 @@
 #include "http.h"
 #include "connection.h"
-std::string HttpResponseContent::GetResponse()                                     //从HttpResponse中返回所需要的内容字节流
+std::string HttpResponseContent::GetResponse(std::string content)                                     //从HttpResponse中返回所需要的内容字节流
 {
 	std::ostringstream ostream;
 	ostream << "HTTP/1.1" << " " << http_code << " " << http_phrase << "\r\n"
@@ -16,12 +16,12 @@ std::string HttpResponseContent::GetResponse()                                  
 
 	std::string b = "<html>\n"
 					"<title>myhttpd</title>\n"
-					"<p>Welcome to myhttpd.\n"
-					"<h1>CGI demo</h1>\n"
-					"<p>\n"
-					"<a href=\"../cgi/date.cgi\">Display Date</a>\n"
-					"</form>\n"
-					"</html>";
+					"<p>Welcome to myhttpd.\n</p>"
+					"<h1>The received request</h1>\n";
+
+					//"<a href=\"../cgi/date.cgi\">Display Date</a>\n";
+	b += content;
+	b += "</html>";
 
 	ostream << "Content-Length: " << b.size() << "\r\n\r\n";
 	//ostream << "Content-Length: " << http_body.size() << "\r\n\r\n";
@@ -29,6 +29,19 @@ std::string HttpResponseContent::GetResponse()                                  
 
 	return ostream.str();
 }
+
+std::string HttpRequestContent::GetRequestContent(){
+	std::ostringstream ostream;
+	ostream<<"<p>http_method is:"<<http_method<<"</p>";
+	ostream<<"<p>http_url is:"<<http_url<<"</p>";
+	//ostream<<"<p>http_url is:"<<http_url<<"</p>\n";
+	for(auto s:http_headers){
+		ostream<<"<p>"<<s.first<<" is:"<<s.second<<"</p>";
+	}
+	ostream<<"<p>http_body is:"<<http_body<<"</p>";
+	return ostream.str();
+}
+
 
 void HttpResponseContent::ResetResponse()                                          //重置Response
 {
